@@ -31,4 +31,23 @@ class SessionUtil
 
         return $payload->userId;
     }
+
+    public static function getProviderId(): int
+    {
+        /** @var ServerRequestInterface $request */
+        $request = Context::get(ServerRequestInterface::class);
+
+        if (empty($request)) {
+            return 0;
+        }
+
+        /** @var SessionPayloadEntity $payload */
+        $payload = $request->getAttribute(LoginMiddleware::PAYLOAD_KEY);
+
+        if (empty($payload) || empty($payload->providerId)) {
+            return 0;
+        }
+
+        return $payload->providerId;
+    }
 }

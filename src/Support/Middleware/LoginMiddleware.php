@@ -30,13 +30,15 @@ class LoginMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $userId = $request->getHeader('X-User-Id')[0] ?? '';
+        $providerId = $request->getHeader('X-Provider-Id')[0] ?? '';
         $params = $request->getQueryParams();
 
         if (array_key_exists('debugUser', $params) && env('APP_ENV') != 'production') {
             $userId = $params['debugUser'];
+            $providerId = 1;
         }
 
-        if (empty($userId)) {
+        if (empty($userId) || empty($providerId)) {
             throw new UnauthorizedException(
                 $this->config->get('smile.unauthorized_message', '请您登录后再进行操作'),
                 $this->config->get('smile.unauthorized_code', 400)
@@ -45,6 +47,7 @@ class LoginMiddleware implements MiddlewareInterface
 
         $sessionPayload = new SessionPayloadEntity();
         $sessionPayload->userId = $userId;
+        $sessionPayload->providerId = $providerId;
 
         $request = Context::override(ServerRequestInterface::class, fn() => $request->withAttribute(self::PAYLOAD_KEY, $sessionPayload));
 
