@@ -11,13 +11,12 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class CsrfMiddleware implements MiddlewareInterface
 {
-
     public static function addCsrfHeaders(ResponseInterface $response): ResponseInterface
     {
         $csrfHeader = 'x-request-id, authorization, Origin, X-Requested-With, Content-Type, Accept';
         return $response
-            ->withHeader('Access-Control-Allow-Headers', $csrfHeader)
-            ->withHeader('Access-Control-Allow-Origin', '*');
+            ->withHeader('Access-Control-Allow-Headers', $csrfHeader);
+//            ->withHeader('Access-Control-Allow-Origin', '*');
     }
 
     /**
