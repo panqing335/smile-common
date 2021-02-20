@@ -26,8 +26,7 @@ class CommonExceptionHandler extends ExceptionHandler
     public function handle(Throwable $throwable, ResponseInterface $response)
     {
         $hyperfResponse = CsrfMiddleware::addCsrfHeaders(new Response($response));
-        $this->stopPropagation();
-        $userId = SessionUtil::getUserId();
+        $userId = SessionUtil::getUserId(true);
 
         $logData = [
             'exception' => get_class($throwable),
@@ -39,6 +38,7 @@ class CommonExceptionHandler extends ExceptionHandler
         ];
 
         if ($throwable instanceof UnauthorizedException) {
+            $this->stopPropagation();
             Logger::get()->warning($throwable->getMessage(), $logData);
 
             return $hyperfResponse->withStatus(401)->json(
@@ -48,6 +48,7 @@ class CommonExceptionHandler extends ExceptionHandler
                 )
             );
         } elseif ($throwable instanceof ValidationException) {
+            $this->stopPropagation();
             Logger::get()->warning($throwable->getMessage(), $logData);
 
             $errorBody = $throwable->validator->errors()->first();
@@ -58,6 +59,7 @@ class CommonExceptionHandler extends ExceptionHandler
                 )
             );
         } elseif ($throwable instanceof BusinessException) {
+            $this->stopPropagation();
             Logger::get()->warning($throwable->getMessage(), $logData);
 
             return $hyperfResponse->withStatus(422)->json(

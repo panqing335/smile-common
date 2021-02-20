@@ -10,7 +10,7 @@ class JsonFormatter extends \Monolog\Formatter\JsonFormatter
 {
     public function format(array $record): string
     {
-        $record['userId'] = SessionUtil::getUserId();
+        $record['userId'] = SessionUtil::getUserId(true);
         return parent::format($record);
     }
 }

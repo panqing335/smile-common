@@ -22,9 +22,9 @@ class BaseModel extends Model implements CacheableInterface
 {
     use Cacheable, CamelCase, SoftDeletes;
 
-    const CREATED_AT = 'created_time';
-    const UPDATED_AT = 'updated_time';
-    const DELETED_AT = 'deleted_time';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
+    const DELETED_AT = 'deleted_at';
 
     public function setPrimaryKey($key)
     {

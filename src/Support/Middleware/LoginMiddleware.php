@@ -13,6 +13,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Smile\Common\Support\Entity\SessionPayloadEntity;
 use Smile\Common\Support\Exception\UnauthorizedException;
+use Smile\Common\Support\Util\SessionUtil;
 
 class LoginMiddleware implements MiddlewareInterface
 {
@@ -35,15 +36,25 @@ class LoginMiddleware implements MiddlewareInterface
 
         if (array_key_exists('debugUser', $params) && env('APP_ENV') != 'production') {
             $userId = $params['debugUser'];
-            $providerId = 1;
+            $providerId = $params['debugProviderId'];
         }
 
-        if (empty($userId) || empty($providerId)) {
+        if (empty($userId)) {
             throw new UnauthorizedException(
                 $this->config->get('smile.unauthorized_message', '请您登录后再进行操作'),
                 $this->config->get('smile.unauthorized_code', 400)
             );
         }
+
+        if ($request->getHeader('Is-Provider')) {
+            if (empty($providerId)) {
+                throw new UnauthorizedException(
+                    $this->config->get('smile.unauthorized_message', '您还不是服务商'),
+                    $this->config->get('smile.unauthorized_code', 400)
+                );
+            }
+        }
+
 
         $sessionPayload = new SessionPayloadEntity();
         $sessionPayload->userId = $userId;
