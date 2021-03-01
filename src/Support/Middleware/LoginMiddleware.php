@@ -46,7 +46,7 @@ class LoginMiddleware implements MiddlewareInterface
             $staffId = $params['staffId'];
         }
 
-        if (empty($userId)) {
+        if (empty($userId) && !$request->getHeader('Is-Provider')) {
             throw new UnauthorizedException(
                 $this->config->get('smile.unauthorized_message', '请您登录后再进行操作'),
                 $this->config->get('smile.unauthorized_code', 400)
