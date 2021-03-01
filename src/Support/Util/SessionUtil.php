@@ -86,6 +86,41 @@ class SessionUtil
         return $providerId;
     }
 
+    public static function _getStaffId(): int
+    {
+        /** @var ServerRequestInterface $request */
+        $request = Context::get(ServerRequestInterface::class);
+
+        if (empty($request)) {
+            return 0;
+        }
+
+        /** @var SessionPayloadEntity $payload */
+        $payload = $request->getAttribute(LoginMiddleware::PAYLOAD_KEY);
+
+        if (empty($payload) || empty($payload->staffId)) {
+            return 0;
+        }
+
+        return $payload->staffId;
+    }
+
+    public static function getStaffId(): int
+    {
+        $staff = self::_getStaffId();
+        if ($staff == 0) {
+            /** @var ConfigInterface $config */
+            $config = ApplicationContext::getContainer()->get(ConfigInterface::class);
+
+            throw new UnauthorizedException(
+                $config->get('smile.unauthorized_message', '您还不是服务商员工'),
+                $config->get('smile.unauthorized_code', 400)
+            );
+        }
+
+        return $staff;
+    }
+
     public static function isVisitor()
     {
         return self::_getUserId() == self::VISITOR_ID;

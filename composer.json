@@ -28,6 +28,7 @@
     "hyperf/framework": "~2.0.0",
     "hyperf/logger": "~2.0.0",
     "hyperf/model-cache": "^2.0",
+    "hyperf/redis": "2.0.18",
     "hyperf/validation": "~2.0.0",
     "webonyx/graphql-php": "^14.4"
   },

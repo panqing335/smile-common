@@ -12,4 +12,5 @@ return [
         'query_root_class' => QRoot::class,
         'mutation_root_class' => MRoot::class,
     ],
+    'redis_model_pool' => 'model'
 ];

@@ -6,6 +6,8 @@ namespace Smile\Common\Support\Middleware;
 
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\Inject;
+use Hyperf\Redis\RedisFactory;
+use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\Context;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -13,7 +15,6 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Smile\Common\Support\Entity\SessionPayloadEntity;
 use Smile\Common\Support\Exception\UnauthorizedException;
-use Smile\Common\Support\Util\SessionUtil;
 
 class LoginMiddleware implements MiddlewareInterface
 {
@@ -32,11 +33,18 @@ class LoginMiddleware implements MiddlewareInterface
     {
         $userId = $request->getHeader('X-User-Id')[0] ?? '';
         $providerId = $request->getHeader('X-Provider-Id')[0] ?? '';
+        $staffId = $request->getHeader('X-Staff-Id')[0] ?? '';
+        $changeAuthAt = $request->getHeader('X-Change-Auth-At')[0] ?? '';
         $params = $request->getQueryParams();
 
         if (array_key_exists('debugUser', $params) && env('APP_ENV') != 'production') {
             $userId = $params['debugUser'];
             $providerId = $params['debugProviderId'];
+        }
+
+        if (array_key_exists('debugUser', $params) && env('APP_ENV') != 'production') {
+            $providerId = $params['debugProviderId'];
+            $staffId = $params['staffId'];
         }
 
         if (empty($userId)) {
@@ -53,12 +61,21 @@ class LoginMiddleware implements MiddlewareInterface
                     $this->config->get('smile.unauthorized_code', 400)
                 );
             }
+            $redis = ApplicationContext::getContainer()->get(RedisFactory::class)->get($this->config->get('smile.redis_model_pool'));
+            $staff = $redis->get('{mc:default:m:staff}:id:'. $staffId);
+            if ($staff && $staff['changeAuthAt'] > $changeAuthAt) {
+                throw new UnauthorizedException(
+                    $this->config->get('smile.unauthorized_message', 'Token已失效，请重新登录'),
+                    $this->config->get('smile.unauthorized_code', 400)
+                );
+            }
         }
 
 
         $sessionPayload = new SessionPayloadEntity();
         $sessionPayload->userId = $userId;
         $sessionPayload->providerId = $providerId;
+        $sessionPayload->staffId = $staffId;
 
         $request = Context::override(ServerRequestInterface::class, fn() => $request->withAttribute(self::PAYLOAD_KEY, $sessionPayload));
 
