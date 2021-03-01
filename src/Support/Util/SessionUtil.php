@@ -51,7 +51,7 @@ class SessionUtil
         return $userId;
     }
 
-    public static function _getProviderId(): int
+    protected static function _getProviderId(): int
     {
         /** @var ServerRequestInterface $request */
         $request = Context::get(ServerRequestInterface::class);
@@ -86,7 +86,7 @@ class SessionUtil
         return $providerId;
     }
 
-    public static function _getStaffId(): int
+    protected static function _getStaffId(): int
     {
         /** @var ServerRequestInterface $request */
         $request = Context::get(ServerRequestInterface::class);
