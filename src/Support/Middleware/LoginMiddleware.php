@@ -39,10 +39,9 @@ class LoginMiddleware implements MiddlewareInterface
 
         if (array_key_exists('debugUser', $params) && env('APP_ENV') != 'production') {
             $userId = $params['debugUser'];
-            $providerId = $params['debugProviderId'];
         }
 
-        if (array_key_exists('debugUser', $params) && env('APP_ENV') != 'production') {
+        if (array_key_exists('debugProviderId', $params) && env('APP_ENV') != 'production') {
             $providerId = $params['debugProviderId'];
             $staffId = $params['staffId'];
         }
