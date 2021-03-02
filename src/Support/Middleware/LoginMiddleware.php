@@ -44,6 +44,7 @@ class LoginMiddleware implements MiddlewareInterface
         if (array_key_exists('debugProviderId', $params) && env('APP_ENV') != 'production') {
             $providerId = $params['debugProviderId'];
             $staffId = $params['staffId'];
+            $request = $request->withaddedHeader('Is-Provider', '1');
         }
 
         if (empty($userId) && !$request->getHeader('Is-Provider')) {
@@ -60,7 +61,7 @@ class LoginMiddleware implements MiddlewareInterface
                     $this->config->get('smile.unauthorized_code', 400)
                 );
             }
-            $redis = ApplicationContext::getContainer()->get(RedisFactory::class)->get($this->config->get('smile.redis_model_pool'));
+            $redis = ApplicationContext::getContainer()->get(RedisFactory::class)->get($this->config->get('databases.default.cache.pool'));
             $staff = $redis->get('{mc:default:m:staff}:id:'. $staffId);
             if ($staff && $staff['changeAuthAt'] > $changeAuthAt) {
                 throw new UnauthorizedException(
