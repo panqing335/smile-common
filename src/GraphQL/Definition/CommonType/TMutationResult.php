@@ -28,6 +28,6 @@ class TMutationResult extends ObjectType
 
     public function resolveMessage($val, array $args)
     {
-        return "success";
+        return "操作成功";
     }
 }
